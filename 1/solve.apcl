@@ -1,0 +1,8 @@
+
+data: get 0 read_table 'data.txt';
+
+totals: (map sum) (map (\v: take (length v)-1 v)) (map (\p: slice (get 0 p) (get 1 p) data)) (scan_n (&>>)) 2 (\v: 0 &> (map (1+)) (index none v) <& length v) data;
+
+result1: (reduce (>.)) totals;
+
+result2: sum take 3 reverse sort totals;
