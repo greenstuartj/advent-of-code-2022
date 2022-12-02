@@ -5,7 +5,7 @@ rps: ['rock', 'paper', 'scissors'];
 
 normal p t: get 0 get index t p rps;
 
-data: (amend_with map normal p1) 0 transpose (map string_split ' ') (filter (!=none)) read_lines 'data.txt';
+data: (amend_with map normal p1) 0 read_dsv 'data.txt' ' ' ':';
 
 turns1: transpose (amend_with map normal p2) 1  data;
 
