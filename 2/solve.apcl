@@ -15,14 +15,14 @@ turns2:
  (map \t: [get 0 t, get get 0 index get 0 t rotate get 0 index get 1 t shifts rps rps])
  transpose data;
 
-wins t: (map (\t:
+wins turns: (map (\t:
   if (get 0 t) = (get 1 t) then
     3
   else if (get 0 index (get 1 t) rotate 1 rps) = (get 0 index (get 0 t) rps) then
     6
   else
     0))
-  t;
+  turns;
 
 score t: sum (zip_with (+)) wins t (map (1+)) concat index (map get 1) t rps;
 
