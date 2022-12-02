@@ -1,0 +1,32 @@
+
+data: transpose (map string_split ' ') (filter (!=none)) read_lines 'data.txt';
+
+p1:  ['A', 'B', 'C'];
+p2:  ['X', 'Y', 'Z'];
+rps: ['rock', 'paper', 'scissors'];
+
+normal p t: get 0 get index t p rps;
+
+turns: transpose (amend_with map normal p2) 1 (amend_with map normal p1) 0 data;
+
+shifts: ['Y', 'X', 'Z'];
+
+turns2:
+ (map \t: [get 0 t, get get 0 index get 0 t rotate get 0 index get 1 t shifts rps rps])
+ transpose (amend_with map normal p1) 0 data;
+
+wins t: (map (\t:
+  if (get 0 t) = (get 1 t) then
+    3
+  else if (get 0 index (get 1 t) rotate 1 rps) = (get 0 index (get 0 t) rps) then
+    6
+  else
+    0))
+  t;
+
+score t: sum (zip_with (+)) wins t (map (1+)) concat index (map get 1) t rps;
+
+result1: score turns;
+
+result2: score turns2;
+
