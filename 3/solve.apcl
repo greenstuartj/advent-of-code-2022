@@ -1,0 +1,16 @@
+
+data: (filter (!=none)) read_lines 'data.txt';
+
+priorities: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+part1:
+  concat (map (\n c: intersection take n c drop n c) @ reflex (/2) @ length) data;
+
+part2:
+  concat get (filter ((=0) @ (%3))) iota (reflex length) (scan_n intersection) 3 data;
+
+answer: sum @ (map (1+)) @ concat @ (flip index) priorities;
+
+result1: answer part1;
+
+result2: answer part2;
