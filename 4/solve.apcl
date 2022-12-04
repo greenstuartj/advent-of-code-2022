@@ -7,7 +7,7 @@ spread from to: (map (+from)) iota 1+(to-from);
 
 subset x y: x = intersection x y;
 
-spreads: (map \p: [(apply spread) get 0 p, (apply spread) get 1 p]) data;
+spreads: (map map apply spread) data;
 
 result1:
   sum (zip_with (or))
