@@ -1,0 +1,18 @@
+
+parse: (map map string_to_number) @ (map string_split '-') @ string_split ',';
+
+data: (map parse) (filter none !=) read_lines 'data.txt';
+
+spread from to: (map (+from)) iota 1+(to-from);
+
+subset x y: x = intersection x y;
+
+spreads: (map \p: [(apply spread) get 0 p, (apply spread) get 1 p]) data;
+
+result1:
+  sum (zip_with (or))
+    (map apply subset) spreads
+    (map (apply subset) @ reverse) spreads;
+
+result2:
+  sum (map (!=0) @ length @ apply intersection) spreads;
