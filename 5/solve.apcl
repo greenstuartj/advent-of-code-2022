@@ -1,0 +1,52 @@
+
+data: read_lines 'data.txt';
+
+stacks:
+  (map string_replace ']' '')
+  (map string_replace ' ' '')
+  (filter member ']')
+  string_split '['
+  concat concat transpose take ((get 0 index none data)-1) data;
+
+take' n v: take (n <. length v) v;
+drop' n v: drop (n <. length v) v;
+
+debug: {
+  input v;
+  v: [];
+  input m;
+  m: [];
+  input s;
+  s: [];
+  input d;
+  d: [];
+};
+
+instructions:
+  (map map string_to_number)
+  (map string_split ' ')
+  (map string_replace 'to '   '')
+  (map string_replace 'from ' '')
+  (map string_replace 'move ' '')
+  drop 1 (apply slice) (index none data) <& data;
+
+move f n from to stack:
+  let crates: f take' n get (from-1) stack in
+  let source: drop' (length crates) get (from-1) stack in
+  let destination: crates & get (to-1) stack in
+  let g: debug->v<-((debug->v) & [crates]) in
+  let h: debug->m<-((debug->m) & [[n, from, to, stack]]) in
+  let i: debug->s<-((debug->s) & [get (from-1) stack]) in
+  let j: debug->d<-((debug->d) & [get (to-1) stack]) in
+  amend (to-1) destination
+  amend (from-1) source stack;
+
+answer f:
+  concat
+  (filter none !=)
+  (map get 0)
+  (reduce \e a: (apply move f) e <& a) (reverse instructions) <& stacks;
+
+result1: answer reverse;
+
+result2: answer id;
