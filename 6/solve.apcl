@@ -1,0 +1,16 @@
+
+data: get 0 read_lines 'data.txt';
+
+marker n s:
+  n +
+  get 0
+  (flip replicate)
+  (reflex iota @ length)
+  (map (=n) @ length)
+  (map unique)
+  (scan_n (&>>)) n
+  string_to_vector s;
+
+result1: marker 4 data;
+
+result2: marker 14 data;
