@@ -1,0 +1,11 @@
+
+data: (filter none !=) read_lines 'sample.txt';
+
+ups:
+  (map (\x: if x then 1 else 0)) (map (\x: (member 'cd' x) and not member '..' x)) data;
+
+downs:
+  (map (\x: if x then ~1 else 0)) (map (\x: member '..' x)) data;
+
+x: (scan (+)) (zip_with (+)) ups downs;
+
