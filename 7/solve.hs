@@ -19,7 +19,7 @@ parseLine line = aux $ words line
   where aux ["$", "cd", ".."] = CdUp
         aux ["$", "cd", name] = MkDir name
         aux ["$", "ls"]       = NoOp
-        aux ["dir", _]     = NoOp
+        aux ["dir", _]        = NoOp
         aux [size, name]      = Touch name (read size :: Integer)
         aux _                 = NoOp
 
