@@ -1,8 +1,11 @@
 
+input file;
+file: 'sample.txt';
+
 data:
   (filter not @ member '$ ls')
   (filter none !=)
-  read_lines 'sample.txt';
+  read_lines file;
 
 ups:
   (map (\x: if x then 1 else 0)) (map (\x: (member '$ cd' x) and not member '..' x)) data;
@@ -25,3 +28,5 @@ g n:
 dir_size d: sum (map string_to_number @ (get 0) @ string_split ' ') (filter (!=none) @ string_to_number @ get 0) slice (f d) (f d) + (g d) data;
 
 result1: sum (filter (<=100000))(map dir_size) unique groups;
+
+result2: (reduce (<.)) (filter (>=(30000000-(70000000-dir_size 1)))) (map dir_size) unique groups;
