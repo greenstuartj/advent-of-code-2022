@@ -19,7 +19,7 @@ parseLine line = aux $ words line
   where aux ["$", "cd", ".."] = CdUp
         aux ["$", "cd", name] = MkDir name
         aux ["$", "ls"]       = NoOp
-        aux ["dir", name]     = NoOp
+        aux ["dir", _]     = NoOp
         aux [size, name]      = Touch name (read size :: Integer)
         aux _                 = NoOp
 
@@ -38,18 +38,18 @@ flatSystem :: System -> [System]
 flatSystem d@(Dir _ dirs _) = d : (S.toList dirs >>= flatSystem)
 
 du :: System -> Integer
-du (Dir name dirs files) = fileSize + dirSize
-  where fileSize = sum $ fmap snd $ S.toList files
-        dirSize  = sum $ fmap du $ S.toList dirs
+du (Dir _ dirs files) = fileSize + dirSize
+  where fileSize = sum $ snd <$> S.toList files
+        dirSize  = sum $ du <$> S.toList dirs
 
 part1 :: System -> Integer
-part1 system = sum $ filter (<= 100000) $ fmap du $ flatSystem system
+part1 system = sum $ filter (<= 100000) $ du <$> flatSystem system
 
 part2 :: System -> Integer
 part2 system = minimum $ filter (>= delete) sizes
   where total    = 70000000
         atLeast  = 30000000
-        sizes    = fmap du $ flatSystem system
+        sizes    = du <$> flatSystem system
         homeSize = head sizes
         delete   = atLeast - (total - homeSize)
 
@@ -57,8 +57,7 @@ main :: IO ()
 main = do
   contents <- readFile "data.txt"
   let
-    system = (\(sys,_) -> sys)
-             $ build (fmap parseLine $ tail $ lines contents) (Dir "/" S.empty S.empty)
+    system = fst $ build (fmap parseLine $ tail $ lines contents) (Dir "/" S.empty S.empty)
     in do
-    putStrLn $ show $ part1 system
-    putStrLn $ show $ part2 system
+    print $ part1 system
+    print $ part2 system
