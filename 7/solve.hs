@@ -60,5 +60,5 @@ main = do
     system = (\(sys,_) -> sys)
              $ build (fmap parseLine $ tail $ lines contents) (Dir "/" S.empty S.empty)
     in do
-    putStrLn $ Prelude.show $ part1 system
-    putStrLn $ Prelude.show $ part2 system
+    putStrLn $ show $ part1 system
+    putStrLn $ show $ part2 system
