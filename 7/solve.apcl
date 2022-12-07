@@ -1,11 +1,27 @@
 
-data: (filter none !=) read_lines 'sample.txt';
+data:
+  (filter not @ member '$ ls')
+  (filter none !=)
+  read_lines 'sample.txt';
 
 ups:
-  (map (\x: if x then 1 else 0)) (map (\x: (member 'cd' x) and not member '..' x)) data;
+  (map (\x: if x then 1 else 0)) (map (\x: (member '$ cd' x) and not member '..' x)) data;
 
 downs:
   (map (\x: if x then ~1 else 0)) (map (\x: member '..' x)) data;
 
 x: (scan (+)) (zip_with (+)) ups downs;
 
+groups: (scan (+)) ups;
+
+f n: get 0 index n groups;
+g n:
+  let end: (index_where not @ id) (true &> (scan_n (\x y: (y=n) or (n<=y) or x <= y)) 2 drop f n x) in
+  if 0 != length end then
+    get 0 end
+  else
+    (length x) - f n;
+
+dir_size d: sum (map string_to_number @ (get 0) @ string_split ' ') (filter (!=none) @ string_to_number @ get 0) slice (f d) (f d) + (g d) data;
+
+result1: sum (filter (<=100000))(map dir_size) unique groups;
