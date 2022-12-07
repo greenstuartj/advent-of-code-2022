@@ -57,7 +57,9 @@ main :: IO ()
 main = do
   contents <- readFile "data.txt"
   let
-    system = fst $ build (fmap parseLine $ tail $ lines contents) (Dir "/" S.empty S.empty)
+    instructions = map parseLine $ tail $ lines contents
+    root = (Dir "/" S.empty S.empty)
+    system = fst $ build instructions root
     in do
     print $ part1 system
     print $ part2 system
