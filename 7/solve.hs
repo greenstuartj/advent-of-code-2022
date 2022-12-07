@@ -6,7 +6,7 @@ data System = Dir String (S.Set System) (S.Set File)
             deriving (Show, Eq)
 
 instance Ord System where
-  compare (Dir nameA _ _)  (Dir nameB _ _)  = compare nameA nameB
+  compare (Dir nameA _ _) (Dir nameB _ _)  = compare nameA nameB
 
 data Instruction = MkDir String
                  | CdUp
@@ -58,7 +58,7 @@ main = do
   contents <- readFile "data.txt"
   let
     instructions = map parseLine $ tail $ lines contents
-    root = (Dir "/" S.empty S.empty)
+    root = Dir "/" S.empty S.empty
     system = fst $ build instructions root
     in do
     print $ part1 system
