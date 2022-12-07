@@ -35,3 +35,28 @@ result2: (reduce (<.)) (filter (>=z)) (map dir_size) unique groups;
 
 # duplicate check ? same depth, but need same parents #
 # let v: (map concat) transpose [replicate ups data, (map string) replicate ups x] in (map \w: length index w v) v #
+
+dir: {
+  input name;
+  input dirs;
+  dirs: [];
+  input files;
+  files: [];
+
+  size: sum ((map \d: d->size) dirs) & (map \f: f->size) files;
+  add_dir d: # check member # ;
+  add_file f: # check memeber # ;
+};
+
+file: {
+  input name;
+  input size;
+};
+
+touch name size:
+  let f: new file in
+  let n: f->name<-name in
+  let s: f->size<-size in
+  f;
+
+mkdir name: (new dir)->name<-name;
