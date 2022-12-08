@@ -6,10 +6,10 @@ data:
   read_lines 'data.txt';
 
 transforms: [ [ id, id ]
-             , [ transpose , transpose ]
-             , [ (map reverse) @ transpose, transpose @ map reverse ]
-             , [ map reverse, map reverse ]
-             ];
+            , [ transpose , transpose ]
+            , [ (map reverse) @ transpose, transpose @ map reverse ]
+            , [ map reverse, map reverse ]
+            ];
 
 visible transform data:
   (get 1 transform)
@@ -21,3 +21,31 @@ visible transform data:
 
 result1:
   sum concat (reduce zip_with zip_with (or)) (map \t: (visible t) data) transforms;
+
+visible2 height trees:
+  let in_view: (map (>=height)) trees in
+  if 0 != length index true in_view then
+    1 + get 0 index true in_view
+  else
+    length trees;
+
+coordinates: concat catalogue (iota length get 0 data) (iota length (map get 0) data);
+
+get_coord coord grid: get get 1 coord get get 0 coord grid;
+
+get_left coord grid: slice 0 (get 1 coord) get get 0 coord grid;
+get_right coord grid: slice (1 + get 1 coord) (length get 0 grid) get get 0 coord grid;
+get_up coord grid: slice 0 (get 0 coord) (map get get 1 coord) grid;
+get_down coord grid: slice (1 + get 0 coord) (length (map get 0) grid) (map get get 1 coord) grid;
+
+scenic_score coord grid:
+  let visible_trees: [ reverse get_left coord grid
+                     , get_right coord grid
+		     , reverse get_up coord grid
+		     , get_down coord grid
+		     ]
+  in
+  let tree: get_coord coord grid in
+  (reduce (*)) (map visible2 tree) visible_trees;
+
+result2: (reduce (>.)) (map \coord: scenic_score coord data) coordinates;
