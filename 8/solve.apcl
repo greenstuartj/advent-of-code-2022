@@ -1,0 +1,23 @@
+
+data:
+  (map map string_to_number)
+  (map string_to_vector)
+  (filter none !=)
+  read_lines 'data.txt';
+
+transforms: [ [ id, id ]
+             , [ transpose , transpose ]
+             , [ (map reverse) @ transpose, transpose @ map reverse ]
+             , [ map reverse, map reverse ]
+             ];
+
+visible transform data:
+  (get 1 transform)
+  (map \row: (reduce \e a: amend e true a) (unique row) <& (map const false) row)
+  (map map get 0)
+  (zip_with index)
+  (reflex map scan (>.))
+  (get 0 transform) data;
+
+result1:
+  sum concat (reduce zip_with zip_with (or)) (map \t: (visible t) data) transforms;
