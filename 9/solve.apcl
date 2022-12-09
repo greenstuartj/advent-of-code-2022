@@ -1,0 +1,17 @@
+
+data: (amend_with (map map (+1)) @ map iota) 1 read_dsv 'sample.txt' ' ' ':';
+
+moves: 'RLUD';
+functions: [ R, L, U, D ];
+
+get_move move: get (get 0 index move moves) functions;
+
+R move initial: (map ((get 0 initial)&>>)) (map (+(get 1 initial))) move;
+L move initial: (map ((get 0 initial)&>>)) (map ((get 1 initial)-)) reverse move;
+U move initial: (map (<<&(get 1 initial))) (map (+(get 0 initial))) move;
+D move initial: (map (<<&(get 1 initial))) (map ((get 0 initial)-)) reverse move;
+
+x:
+  let moves: (map \p: get_move (get 0 p) (get 1 p)) transpose data in
+  let step: \e a: a & e get ~1 a in
+  (reduce (\i a: step get i moves a)) (reverse iota length moves) <& [[0,0]]
