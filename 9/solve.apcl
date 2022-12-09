@@ -13,7 +13,7 @@ D move initial: reverse (map (<<&(get 1 initial))) (map ((get 0 initial)-)) reve
 
 signum n: if n=0 then 0 else if n>0 then 1 else ~1;
 
-deltas: concat (reflex catalogue_with \x y: [x, y]) [1,0,~1];
+deltas: concat (reflex catalogue) [1,0,~1];
 
 dont_move tail head:
   member true (\t h: (map (=h)) (map (zip_with (+)) t) deltas) tail head;
