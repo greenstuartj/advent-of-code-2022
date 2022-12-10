@@ -23,9 +23,13 @@ lit n m: member m (zip_with (+)) [~1,0,1] (map const n) iota 3;
 
 display b: if b then '#' else '.';
 
+reshape cols rows vec:
+  (map \p: (apply slice) p <& vec) (scan_n (&>>)) 2 0 &> (scan (+))
+  (map const cols) iota rows;
+
 result2:
   let
-    crt: replicate (map (=0) @ (%40)) iota (reflex length) (scan_n (&>>)) 40 register
+    crt: reshape 40 6 register
   in
   (reduce join '\n')
   (map \row: concat (map display) (zip_with lit) row iota 40)
