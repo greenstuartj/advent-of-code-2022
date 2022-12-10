@@ -1,0 +1,33 @@
+
+data: (filter none !=) read_lines 'data.txt';
+
+parse n line:
+  if 'noop' = line then
+    [0]
+  else
+    ((map const 0) iota n)
+    <&
+    string_to_number
+    get 1
+    string_split ' ' line;
+
+register: (scan (+)) 1 &> concat (map parse 1) data;
+
+result1: let cycles: [20, 60, 100, 140, 180, 220] in
+  sum
+  (zip_with (*))
+    cycles
+    get cycles 1 &> register;
+
+lit n m: member m (zip_with (+)) [~1,0,1] (map const n) iota 3;
+
+display b: if b then '#' else '.';
+
+result2:
+  let
+    crt: replicate (map (=0) @ (%40)) iota (reflex length) (scan_n (&>>)) 40 register
+  in
+  (reduce join '\n')
+  (map \row: concat (map display) (zip_with lit) row iota 40)
+  crt;
+
