@@ -28,10 +28,7 @@ reshape cols rows vec:
   (map const cols) iota rows;
 
 result2:
-  let
-    crt: reshape 40 6 register
-  in
   (reduce join '\n')
   (map \row: concat (map display) (zip_with lit) row iota 40)
-  crt;
+  reshape 40 6 register;
 
