@@ -1,0 +1,90 @@
+
+data: (filter none !=) read_lines 'data.txt';
+
+build_op op_string operand:
+  let op: if op_string = '*' then (*) else (+) in
+  if operand = 'old' then
+    (reflex op)
+  else
+    (op string_to_number operand);
+
+parse_monkey monkey:
+  let get_items: (map string_to_number)
+               @ (string_split ', ')
+               @ (get 1)
+               @ string_split ': '
+  in
+  let get_op: (apply build_op)
+            @ slice
+            @ (reflex (-2))
+            @ (reflex length)
+            @ string_split ' '
+  in
+  let get_last: string_to_number @ (get ~1) @ string_split ' ' in
+  (\m: (slice 0 3 m) <& reverse slice 3 5 m)
+  (amend_with get_items) 0
+  (amend_with get_op)    1
+  (amend_with get_last)  2
+  (amend_with get_last)  3
+  (amend_with get_last)  4
+  drop 1 monkey;
+
+monkeys:
+  (map parse_monkey)
+  (map \p: (apply slice) p <& data)
+  (scan_n (&>>)) 2
+  (<& length data)
+  (flip replicate)
+  (reflex iota @ length)
+  (map member 'Monkey')
+  data;
+
+get_items:   get 0;
+get_op:      get 1;
+get_test:    get 2;
+get_targets: get 3;
+
+group targets items:
+  let unique_targets: unique targets in
+  [unique_targets, get (index (unique_targets) targets) items];
+
+target worry_f monkey:
+  let worry: worry_f (map get_op monkey) get_items monkey in
+  let test: (map (=0) @ (% get_test monkey)) worry in
+  group (get (map (+0)) test get_targets monkey) worry;
+
+throw groups monkeys:
+  let empties: (map const []) iota length monkeys in
+  let items:
+    (reduce \g e: (amend_with (& get 1 g)) (get 0 g) e)
+    (transpose groups) <& empties
+  in
+  (zip_with \i: (amend_with (&i)) 0) items monkeys;
+
+step worry_f monkey_number monkeys:
+  let monkey: get monkey_number monkeys in
+  let inspected: length get_items monkey in
+  let targets: (target worry_f) monkey in
+  let new_monkey: amend 0 [] monkey in
+  let new_monkeys: amend monkey_number new_monkey monkeys in
+  [inspected, throw targets new_monkeys];
+
+round worry_f monkey_round:
+  (reduce (\i mr:
+             let r: (step worry_f) i get 1 mr in
+             [(amend_with (+ get 0 r)) i get 0 mr, get 1 r]))
+  (reverse iota length monkeys) <& monkey_round;
+
+answer worry_f n:
+  let steps: (repeat round worry_f) n [(map const 0) iota length monkeys, monkeys] in
+  (reduce (*))
+  take 2
+  reverse
+  sort
+  get 0
+  steps;
+
+result1: (answer (map floor @ (/3))) 20;
+
+supermod: (reduce (*)) (map get_test) monkeys;
+result2: (answer (map floor @ (%supermod))) 10000;
