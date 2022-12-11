@@ -77,12 +77,7 @@ round worry_f monkey_round:
 
 answer worry_f n:
   let steps: (repeat round worry_f) n [(map const 0) iota length monkeys, monkeys] in
-  (reduce (*))
-  take 2
-  reverse
-  sort
-  get 0
-  steps;
+  (reduce (*)) take 2 reverse sort get 0 steps;
 
 result1: (answer (map floor @ (/3))) 20;
 
