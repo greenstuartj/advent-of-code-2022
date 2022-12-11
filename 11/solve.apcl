@@ -87,4 +87,4 @@ answer worry_f n:
 result1: (answer (map floor @ (/3))) 20;
 
 supermod: (reduce (*)) (map get_test) monkeys;
-result2: (answer (map floor @ (%supermod))) 10000;
+result2: (answer (map (%supermod))) 10000;
