@@ -12,17 +12,17 @@ type Coord struct {
 }
 
 func (c Coord) InBounds(height, width int) bool {
-	return c.Row >=0 && c.Row < height && c.Col >=0 && c.Col < width
+	return c.Row >= 0 && c.Row < height && c.Col >= 0 && c.Col < width
 }
 
 func (c Coord) Moves() []Coord {
-	deltas := []int{ -1, 1 }
+	deltas := []int{-1, 1}
 	var moves []Coord
 	for _, d := range deltas {
-		moves = append(moves, Coord{c.Row+d, c.Col})
+		moves = append(moves, Coord{c.Row + d, c.Col})
 	}
 	for _, d := range deltas {
-		moves = append(moves, Coord{c.Row, c.Col+d})
+		moves = append(moves, Coord{c.Row, c.Col + d})
 	}
 	return moves
 }
@@ -84,7 +84,7 @@ type Dijkstra struct {
 func MakeDijkstra(hill Grid) Dijkstra {
 	rows, columns := hill.Dims()
 	graph := MakeGraph(rows, columns)
-	return Dijkstra{ graph }
+	return Dijkstra{graph}
 }
 
 func (d Dijkstra) Start(start, end Coord, hill Grid) {
@@ -133,7 +133,7 @@ func main() {
 			}
 		}
 	}
-	
+
 	fmt.Println(dijkstra.Graph.GetCoord(start))
 	fmt.Println(min)
 }
