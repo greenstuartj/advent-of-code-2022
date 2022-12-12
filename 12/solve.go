@@ -87,12 +87,12 @@ func MakeDijkstra(hill Grid) Dijkstra {
 	return Dijkstra{ graph }
 }
 
-func (d Dijkstra) Start(start, end Coord, hill Grid) {
+func (d Dijkstra) Start(start, end Coord, hill Grid, backwards bool) {
 	d.Graph.SetCoord(start, 0)
-	d.Path(start, end, hill)
+	d.Path(start, end, hill, backwards)
 }
 
-func (d Dijkstra) Path(from, to Coord, hill Grid) {
+func (d Dijkstra) Path(from, to Coord, hill Grid, backwards bool) {
 	currentPath := d.Graph.GetCoord(from)
 	currentHeight := hill.GetCoord(from)
 	height, width := hill.Dims()
@@ -102,49 +102,52 @@ func (d Dijkstra) Path(from, to Coord, hill Grid) {
 			continue
 		}
 		moveHeight := hill.GetCoord(move)
-		if (moveHeight - currentHeight) > 1 {
-			continue
+		if !backwards {
+			if (moveHeight - currentHeight) > 1 {
+				continue
+			}
+		} else {
+			if (currentHeight - moveHeight) > 1 {
+				continue
+			}
 		}
 		movePath := d.Graph.GetCoord(move)
 		if currentPath+1 >= movePath {
 			continue
 		}
 		d.Graph.SetCoord(move, currentPath+1)
-		d.Path(move, to, hill)
+		d.Path(move, to, hill, backwards)
 	}
 }
 
-func part1(start, end Coord, hill Grid) int {
+func part1(start, end Coord, hill Grid) {
 	dijkstra := MakeDijkstra(hill)
-	dijkstra.Start(start, end, hill)
-	return dijkstra.Graph.GetCoord(end)
+	dijkstra.Start(start, end, hill, false)
+	fmt.Println(dijkstra.Graph.GetCoord(end))
 }
 
-func part2(steps int, end Coord, hill Grid) int {
-	min := steps
+func part2(start, end Coord, hill Grid) {
+	dijkstra := MakeDijkstra(hill)
+	dijkstra.Start(end, start, hill, true)
+	min := 1000000
 	for h, row := range hill.grid {
 		for w, i := range row {
 			if i != 0 {
 				continue
 			}
-			dijkstra := MakeDijkstra(hill)
-			dijkstra.Start(Coord{h, w}, end, hill)
-			candidate := dijkstra.Graph.GetCoord(end)
+			candidate := dijkstra.Graph.GetCoord(Coord{h, w})
 			if candidate < min {
 				min = candidate
 			}
 		}
 	}
-	return min
+	fmt.Println(min)
 }
 
 func main() {
 	x, _ := os.ReadFile("data.txt")
 	start, end, hill := parseInput(string(x))
 
-	steps := part1(start, end, hill)
-	min := part2(steps, end, hill)
-
-	fmt.Println(steps)
-	fmt.Println(min)
+	part1(start, end, hill)
+	part2(start, end, hill)
 }
