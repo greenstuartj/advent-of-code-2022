@@ -87,12 +87,12 @@ func MakeDijkstra(hill Grid) Dijkstra {
 	return Dijkstra{ graph }
 }
 
-func (d Dijkstra) Start(start, end Coord, hill Grid, backwards bool) {
+func (d Dijkstra) Start(start, end Coord, hill Grid) {
 	d.Graph.SetCoord(start, 0)
-	d.Path(start, end, hill, backwards)
+	d.Path(start, end, hill)
 }
 
-func (d Dijkstra) Path(from, to Coord, hill Grid, backwards bool) {
+func (d Dijkstra) Path(from, to Coord, hill Grid) {
 	currentPath := d.Graph.GetCoord(from)
 	currentHeight := hill.GetCoord(from)
 	height, width := hill.Dims()
@@ -102,34 +102,26 @@ func (d Dijkstra) Path(from, to Coord, hill Grid, backwards bool) {
 			continue
 		}
 		moveHeight := hill.GetCoord(move)
-		if !backwards {
-			if (moveHeight - currentHeight) > 1 {
-				continue
-			}
-		} else {
-			if (currentHeight - moveHeight) > 1 {
-				continue
-			}
+		if (currentHeight - moveHeight) > 1 {
+			continue
 		}
 		movePath := d.Graph.GetCoord(move)
 		if currentPath+1 >= movePath {
 			continue
 		}
 		d.Graph.SetCoord(move, currentPath+1)
-		d.Path(move, to, hill, backwards)
+		d.Path(move, to, hill)
 	}
 }
 
-func part1(start, end Coord, hill Grid) {
-	dijkstra := MakeDijkstra(hill)
-	dijkstra.Start(start, end, hill, false)
-	fmt.Println(dijkstra.Graph.GetCoord(end))
-}
+func main() {
+	x, _ := os.ReadFile("data.txt")
+	start, end, hill := parseInput(string(x))
 
-func part2(start, end Coord, hill Grid) {
 	dijkstra := MakeDijkstra(hill)
-	dijkstra.Start(end, start, hill, true)
-	min := 1000000
+	dijkstra.Start(end, start, hill)
+
+	min := dijkstra.Graph.GetCoord(start)
 	for h, row := range hill.grid {
 		for w, i := range row {
 			if i != 0 {
@@ -141,13 +133,7 @@ func part2(start, end Coord, hill Grid) {
 			}
 		}
 	}
+	
+	fmt.Println(dijkstra.Graph.GetCoord(start))
 	fmt.Println(min)
-}
-
-func main() {
-	x, _ := os.ReadFile("data.txt")
-	start, end, hill := parseInput(string(x))
-
-	part1(start, end, hill)
-	part2(start, end, hill)
 }
