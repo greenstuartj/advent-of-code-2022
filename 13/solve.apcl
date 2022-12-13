@@ -1,0 +1,56 @@
+
+data:
+  reshape 2
+  (reflex (/2) @ length)
+  (map eval_string)
+  (filter none !=) read_lines 'data.txt';
+
+reshape cols rows vec:
+  (map \p: (apply slice) p <& vec) (scan_n (&>>)) 2 0 &> (scan (+))
+  (map const cols) iota rows;
+
+flatten:
+    (reduce \e a: if is_vector e then e & a else e &> a)
+  @ (amend_with (\e: if is_vector e then e else [e]))
+  @ (reflex (-1) @ length);
+
+fixed_point f x:
+  let x': f x in
+  if x' = x then x else (fixed_point f) x';
+
+compare a b:
+  if a = b then 0 else if a > b then 1 else ~1;
+
+check_element_order a b:
+  if a = none then ~1 else
+  if b = none then 1 else
+  if (is_number a) and (is_number b) then
+    compare a b
+  else if (is_vector a) and (is_vector b) then
+    check_order a b
+  else if is_number a then
+    check_order [a] b
+  else
+    check_order a [b];
+
+check_order a b:
+  (zip_with check_element_order) a b;
+
+order a b:
+  let o: (filter (!=0)) (fixed_point flatten) check_order a b in
+  if  0  = length o then true else if (get 0 o) < 0 then true else false;
+
+result1: sum (map (+1)) index true (map apply order) data;
+
+result2:
+  let dividers: [[[2]], [[6]]] in
+  let d: (concat data) & dividers in
+  (reduce (*))
+  (map (+1))
+  index true
+  (map (flip member) dividers)
+  (flip get) d
+  grade_down
+  (map \i: sum (map order get i d) (slice 0 i d) & slice i+1 length d d)
+  iota length d;
+  
