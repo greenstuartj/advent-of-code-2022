@@ -43,14 +43,6 @@ order a b:
 result1: sum (map (+1)) index true (map apply order) data;
 
 result2:
-  let dividers: [[[2]], [[6]]] in
-  let d: (concat data) & dividers in
-  (reduce (*))
-  (map (+1))
-  index true
-  (map (flip member) dividers)
-  (flip get) d
-  grade_down
-  (map \i: sum (map order get i d) (slice 0 i d) & slice i+1 length d d)
-  iota length d;
-  
+  let d: concat data in
+  let f: \div: length @ filter (flip order) div in
+  (1 + f [[2]] d) * (2 + f [[6]] d);
