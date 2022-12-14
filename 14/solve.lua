@@ -182,12 +182,11 @@ function part1()
       i = i + 1
    end
    print(i)
-   return g
 end
 
 function part2()
-   ls = lines_to_coords(file_to_lines("data.txt"))
-   g = make_grid(ls)
+   local ls = lines_to_coords(file_to_lines("data.txt"))
+   local g = make_grid(ls)
    g[#g+1] = {}
    for i, _ in pairs(g[#g-1]) do
       g[#g][i] = '.'
@@ -201,5 +200,11 @@ function part2()
       i = i + 1
    end
    print(i+2)
-   return g
 end
+
+function main()
+   part1()
+   part2()
+end
+
+main()
