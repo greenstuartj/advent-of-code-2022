@@ -1,0 +1,87 @@
+
+input file;
+file: 'sample.txt';
+
+data:
+  concat
+  (map (concat @ (map apply line) @ (scan_n \a b: [a, b]) 2))
+  (map map map string_to_number)
+  (map map string_split ',')
+  (map string_split ' -> ')
+  (filter none !=) read_lines file;
+
+normal:
+  (\m: (map (amend_with (-m)) 0))
+  (reflex (reduce (<.)) @ map get 0)
+  data;
+
+start: 1 + 500 - (reduce (<.)) (map get 0) data;
+
+signum n: if n>0 then 1 else if n<0 then ~1 else 0;
+
+blank: 0;
+sand: 1;
+wall: 2;
+
+line from to:
+  let diffs: (zip_with (-)) from to in
+  let deltas: (map ~ @ signum) diffs in
+  (seq (zip_with (+)) deltas) 1 + (reduce (>.)) (map abs) diffs from;
+
+grid:
+  let f: \n: (reduce (>.)) (map get n) normal in
+  let cols: 1 + f 0 in
+  let rows: 2 + f 1 in
+  let add_wall: \p g: (amend_with ((amend_with (const wall)) get 0 p)) get 1 p g in
+  (map (blank &>) @ (<& blank))
+  (reduce add_wall)
+  (\g: normal <& g)
+  (map const (map const blank) iota cols)
+  iota rows;
+
+spawn: (amend_with (amend start sand)) 0;
+
+where i row next_row:
+  let deltas: [0, ~1, 1] in
+  let options : index blank get (map (+i)) deltas next_row in
+  if 0 = length options then
+    false
+  else
+    i + get get 0 options deltas;
+
+move i row next_row:
+  let to: where i row next_row in
+  if to then
+    [amend i blank row, amend to sand next_row]
+  else
+    [row, next_row];
+
+collapse_rows rows next_rows:
+  let previous: \a b: if a=b then a else blank in
+  let next: \a b: if a=b then a else sand in
+  let f: \g: reduce zip_with g in
+  [(f previous) rows, (f next) next_rows];
+
+step i g:
+  let row: get i g in
+  let next_row: get (i+1) g in
+  let indicies: index sand row in
+  if 0 = length indicies then g else
+  if next_row = none
+    then amend i (map \c: if c=sand then blank else c) row g else
+  let change:
+    (apply collapse_rows) transpose (map \j: move j row next_row) indicies
+  in
+  amend (i+1) (get 1 change)
+  amend i (get 0 change) g;
+
+drop_sand:
+  (reduce step) @ (<&) @ reverse @ iota @ (reflex length) @ spawn;
+
+result1:
+  (flip (-)) 1
+  get 0
+  ((while
+    \s: (get 0 s) = length index sand concat get 1 s)
+    \s: [1 + get 0 s, drop_sand get 1 s])
+  [0, grid];
